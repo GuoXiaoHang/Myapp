@@ -1,6 +1,5 @@
 package com.haohang.utils;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Stack;
@@ -26,16 +25,33 @@ public class QuizUtils {
 	
 	private QuizUtils() {}
 	
-	public static void main(String[] args) {
-		generateQuiz(0, 10);
-//		String str = "3+1/4/3"; //123*+45*-6-78*+9- and 
-//		String expr = toRPN(str);
-//		String result = caclRPN(expr);
-//		System.out.println(result);
-	}
+//	public static void main(String[] args) {
+//		HashSet<String> set = generateQuiz(10, 100);
+//		for (String string : set) {
+//			System.out.println(string);
+//			String str = caclRPN(toRPN(string));
+//			System.out.println(str);
+//			System.out.println(Ration.toDaiFenShu(str));
+//			System.out.println();
+//			System.out.println();
+//		}
+//		
+//	}
 	
-	public static void generateQuiz(int range, int num) {
+	public static HashSet<String> generateQuiz(int range, int num) {
+		if (range == -1) {
+			range = 10;
+		}
 		
+		HashSet<String> set = new HashSet<>();
+		while (set.size() < num) {
+			String str = second(second(first(range), range), range);
+			if (caclRPN(toRPN(str)).contains("-")) {
+				continue;
+			}
+			set.add(str);
+		}
+		return set;
 	}
 	
 	public static String caclRPN(String expr) {
@@ -64,6 +80,56 @@ public class QuizUtils {
 			}
 		}
 		return ration_stack.pop().toString();
+	}
+	
+	public static String first(int range) {
+		Random random = new Random();
+		String[] op = {"+","-","*","/"};
+		StringBuilder sb = new StringBuilder();
+		int num1 = random.nextInt(range-1) + 1;
+		int num2 = random.nextInt(range-1) + 1;
+		String operator = op[random.nextInt(4)];
+		if (operator.equals("-")) {
+			if (num1 < num2) {
+				int temp;
+				temp = num1;
+				num1 = num2;
+				num2 = temp;
+			}
+		}
+		if (operator.equals("/")) {
+			if (num1 > num2) {
+				num1 = num2%num1;
+			}
+		}
+		sb.append(num1);
+		sb.append(operator);
+		sb.append(num2);
+		return new String(sb);
+		
+	}
+	
+	public static String second(String str, int range) {
+		StringBuilder sb = new StringBuilder(str);
+		Random random = new Random();
+		String[] op = {"+","-","*","/"};
+		Ration r1 = new Ration(caclRPN(toRPN(str)));
+		int num2 = random.nextInt(range-1) + 1;
+		Ration r2 = new Ration(num2, 1);
+		String operator = op[random.nextInt(4)];
+		if (operator.equals("-")) {
+			if (Ration.isNagetive(r1.sub(r2))) {
+				operator = "/";
+			}
+		}
+		if (operator.equals("/")) {
+			if (Ration.isDaiFenShu(r1.div(r2))) {
+				operator = "-";
+			}
+		}
+		sb.append(operator);
+		sb.append(num2);
+		return sb.toString();
 	}
 
     public static String toRPN(String str) {
@@ -157,4 +223,5 @@ enum Operator {
         return false;
     }
 	
+    
 }

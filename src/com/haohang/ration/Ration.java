@@ -11,6 +11,18 @@ public class Ration {
 		yuefen(numerator, denominator);
 	}
 	
+	public Ration(String str) {
+		if (str.contains("/")) {
+			String[] nums = str.split("/");
+			int num1 = Integer.parseInt(nums[0]);
+			int num2 = Integer.parseInt(nums[1]);
+			yuefen(num1, num2);
+		} else {
+			this.numerator = Integer.parseInt(str);
+			this.denominator = 1;
+		}
+	}
+	
 	public Ration mul(Ration mulR) {
 		return new Ration((this.numerator * mulR.numerator), (this.denominator * mulR.denominator));
 	}
@@ -30,13 +42,37 @@ public class Ration {
 		if (this.denominator == 1) {
 			return String.valueOf(this.numerator);
 		} else{
-//			return new String(this.numerator + "/" + this.denominator);
-			if (this.numerator > this.denominator) {
-				int dai = numerator / denominator;
-				return new String(dai + "'" + (this.numerator - this.denominator*dai) + "/" + this.denominator);
+			return new String(this.numerator + "/" + this.denominator);
+		}
+	}
+	
+	public static String toDaiFenShu(String str) {
+		Ration r = new Ration(str);
+		if (r.denominator == 1) {
+			return String.valueOf(r.numerator);
+		} else{
+			if (r.numerator > r.denominator) {
+				int dai = r.numerator / r.denominator;
+				return new String(dai + "'" + (r.numerator - r.denominator*dai) + "/" + r.denominator);
 			} else {
-				return new String(this.numerator + "/" + this.denominator);
+				return new String(r.numerator + "/" + r.denominator);
 			}
+		}
+	}
+	
+	public static boolean isDaiFenShu(Ration r) {
+		if (r.numerator > r.denominator) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public static boolean isNagetive(Ration r) {
+		if (r.toString().contains("-")) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 	
