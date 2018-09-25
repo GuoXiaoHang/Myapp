@@ -1,5 +1,15 @@
 package com.haohang.utils;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Stack;
@@ -130,6 +140,67 @@ public class QuizUtils {
 		sb.append(operator);
 		sb.append(num2);
 		return sb.toString();
+	}
+	
+	public static void check(File exeFile, File ansFile) {
+		File gradeFile = new File("Grade.txt");
+		String exeLine = null;
+		String ansLine = null;
+		int rightCount = 0;
+		int wrongCount = 0;
+		ArrayList<String> rightList = new ArrayList<>();
+		ArrayList<String> wrongList = new ArrayList<>();
+		BufferedReader br_exe = null;
+		BufferedReader br_ans = null;
+		BufferedWriter bw_grade = null;
+		try {
+			br_exe = new BufferedReader(new InputStreamReader(new FileInputStream(exeFile)));
+			br_ans = new BufferedReader(new InputStreamReader(new FileInputStream(ansFile)));
+			bw_grade = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(gradeFile)));
+			while (true) {
+				exeLine = br_exe.readLine();
+//				System.out.println(exeLine);
+				ansLine = br_ans.readLine();
+//				System.out.println(ansLine);
+				if (exeLine == null || ansLine == null) {
+					break;
+				}
+				String[] exeStr = exeLine.split(". "); 
+				String[] ansStr = ansLine.split(". ");
+//				System.out.println(Ration.toDaiFenShu(QuizUtils.caclRPN(QuizUtils.toRPN(exeStr[1]))));
+				if (ansStr[1].equals(Ration.toDaiFenShu(QuizUtils.caclRPN(QuizUtils.toRPN(exeStr[1]))))) {
+					rightCount++;
+//					System.out.println("right");
+					rightList.add(exeStr[0]);
+				} else {
+					wrongCount++;
+//					System.out.println("wrong");
+					wrongList.add(exeStr[0]);
+				}
+			}
+			String rightString = rightList.toString().replace('[', '(').replace(']', ')');
+			String wrongString = wrongList.toString().replace('[', '(').replace(']', ')');
+			bw_grade.write("Correct: " + rightCount + rightString);
+			bw_grade.newLine();
+			bw_grade.write("Wrong: " + wrongCount + wrongString);
+			bw_grade.flush();
+			
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			try {
+				br_ans.close();
+				br_exe.close();
+				bw_grade.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 
     public static String toRPN(String str) {

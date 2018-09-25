@@ -28,38 +28,50 @@ public class Main {
 					System.out.println("-r can't greater than 10");
 					System.exit(0);
 				}
+				
 				break;
 			case "-n":
 				num = Integer.parseInt(args[i+1]);
 				break;
+			case "-e":
+				String exerciseFileName = args[i+1];
+				String answerFileName = args[i+3];
+				File exerciseFile = new File(exerciseFileName);
+				File answerFile = new File(answerFileName);
+				QuizUtils.check(exerciseFile, answerFile);
 
 			default:
-				System.out.println("Can't recognize arguments!");
 				break;
 			}
 		}
 		if (!r_exist) {
-			System.out.println("You must enter -r parameter! or -r must be a positive number");
 			System.exit(0);
 		} else {
 			HashSet<String> set = QuizUtils.generateQuiz(range, num);
-			File file = new File("./Exercises.txt");
-			BufferedWriter bw = null;
+			File exeFile = new File("./Exercises.txt");
+			File ansFile = new File("./Answer.txt");
+			BufferedWriter bw_exe = null;
+			BufferedWriter bw_ans = null;
 			try {
-				bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));
+				bw_exe = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(exeFile)));
+				bw_ans = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(ansFile)));
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			String excercise_line = null;
-			int i = 1;
+			String answer_line = null;
+			int count = 1;
 			for (String string : set) {
 //				System.out.println(string);
-				excercise_line = new String(i + ". " + string);
-				i++;
+				excercise_line = new String(count + ". " + string);
+				answer_line = new String(count + ". " + Ration.toDaiFenShu(QuizUtils.caclRPN(QuizUtils.toRPN(string))));
+				count++;
 				try {
-					bw.write(excercise_line);
-					bw.newLine();
+					bw_exe.write(excercise_line);
+					bw_ans.write(answer_line);
+					bw_exe.newLine();
+					bw_ans.newLine();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -68,12 +80,12 @@ public class Main {
 //				System.out.println(Ration.toDaiFenShu(str));
 			}
 			try {
-				bw.close();
+				bw_exe.close();
+				bw_ans.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			System.out.println("hello");
 		}
 	}
 
